@@ -1,0 +1,2 @@
+测试该文件有没有被打包进去
+E:\JAVA_Project\g6hadoop\src\main\java\udf\Test.java
