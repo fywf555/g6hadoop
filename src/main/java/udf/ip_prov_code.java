@@ -1,12 +1,13 @@
 package udf;
+
 import net.ipip.ipdb.City;
 import org.apache.hadoop.hive.ql.exec.UDF;
+
 import java.io.InputStream;
 import java.util.Arrays;
-/**
- * hive的自定义函数
- */
-public class Test extends UDF{
+
+public class ip_prov_code extends UDF
+{
     //重载
     public String evaluate(String input){
         String ip_info = "-1";
@@ -15,20 +16,12 @@ public class Test extends UDF{
             InputStream in=this.getClass().getResourceAsStream("/mydatavipday3.ipdb");
             City db = new City(in);
             ip_info = Arrays.toString(db.find(input, "CN"));
+            ip_info = ip_info.split(",")[9];
         }
         catch (Exception e) {
 //            e.printStackTrace();
 
         }
         return ip_info;
-    }
-
-    public int evaluate(int a,int b){
-        return a+b;//计算两个数之和
-    }
-
-    public static void main(String[] args) {
-        System.out.println(new Test().evaluate("218.22.113.103"));
-
     }
 }
