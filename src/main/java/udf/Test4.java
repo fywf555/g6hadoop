@@ -9,13 +9,14 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectIn
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.StringObjectInspector;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * 调整小区的格式
  * 460-00-394487-1 --> 394487_1
  */
 
-public class Test4 extends GenericUDF  {
+public class Test4 extends GenericUDF {
     private transient StringObjectInspector allCgi;
     private static City DB;
     @Override
@@ -44,7 +45,7 @@ public class Test4 extends GenericUDF  {
 
         String ip_info = "-1";
         try {
-            ip_info = DB.find(cgi.toString(), "CN")[9];
+            ip_info = Arrays.toString(DB.find(cgi.toString(), "CN"));
         }
         catch (Exception e) {
         }
@@ -62,7 +63,7 @@ public class Test4 extends GenericUDF  {
         ObjectInspector stringOI = PrimitiveObjectInspectorFactory.javaStringObjectInspector;
         sub.initialize(new ObjectInspector[]{stringOI});
 
-        for(int i = 0;i<= 10000;i++)
+        for(int i = 0;i<= 10;i++)
         {
             String input = "116.234.222.36";
             Object result = sub.evaluate(new DeferredObject[]{new DeferredJavaObject(input)});

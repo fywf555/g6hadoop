@@ -3,6 +3,7 @@ package udf;
 import net.ipip.ipdb.City;
 import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
+import org.apache.hadoop.hive.ql.exec.UDFArgumentLengthException;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentTypeException;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDF;
@@ -20,61 +21,44 @@ import java.util.Arrays;
 
 @Description(name = "array_contains", value = "_FUNC_(array, value) - Returns TRUE if the array contains value.", extended = "Example:\n  > SELECT _FUNC_(array(1, 2, 3), 2) FROM src LIMIT 1;\n  true")
 public class IpCityName extends GenericUDF {
-    private transient ObjectInspector valueOI;
-    private transient ListObjectInspector arrayOI;
-    private transient ObjectInspector arrayElementOI;
-    private transient StringObjectInspector stringElementOI;
-    private BooleanWritable result;
+    private transient StringObjectInspector allCgi;
     private static City DB;
-
+    @Override
     public ObjectInspector initialize(ObjectInspector[] arguments) throws UDFArgumentException {
+        ObjectInspector a = arguments[0];
         if (arguments.length != 1) {
-            throw new UDFArgumentException("The function ARRAY_CONTAINS accepts 1 arguments.");
+            throw new UDFArgumentLengthException(
+                    "The operator 'SubstrCgi' accepts one arguments.");
         }
-        //初始化本地变量
-        try {
+        try
+        {
             DB = new City(this.getClass().getResourceAsStream("/mydatavipday3.ipdb"));
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException e)
+        {
         }
-
-//        this.arrayOI = ((ListObjectInspector) arguments[0]);
-//        this.arrayElementOI = this.arrayOI.getListElementObjectInspector();
-        this.stringElementOI = ((StringObjectInspector) arguments[0]);
-        this.valueOI = arguments[0];
-
-        if (!(ObjectInspectorUtils.compareTypes(this.arrayElementOI, this.valueOI))) {
-            throw new UDFArgumentTypeException(1,
-                    "\"" + this.arrayElementOI.getTypeName() + "\"" + " expected at function, but "
-                            + "\"" + this.valueOI.getTypeName() + "\"" + " is found");
-        }
-
-        if (!(ObjectInspectorUtils.compareSupported(this.valueOI))) {
-            throw new UDFArgumentException("The function does not support comparison for \""
-                    + this.valueOI.getTypeName() + "\"" + " types");
-        }
-
-        this.result = new BooleanWritable(false);
-        return PrimitiveObjectInspectorFactory.writableBooleanObjectInspector;
+        this.allCgi = (StringObjectInspector) a;
+        return PrimitiveObjectInspectorFactory.javaStringObjectInspector;
     }
 
-    public String evaluate(GenericUDF.DeferredObject[] arguments) throws HiveException {
-        this.result.set(false);
-        Object array = arguments[0].get();
+    @Override
+    public Object evaluate(DeferredObject[] arguments) throws HiveException {
+        String cgi = allCgi.getPrimitiveJavaObject(arguments[0].get());
+        if(null == cgi) {
+            return null;
+        }
+
         String ip_info = "";
         try {
-            ip_info = Arrays.toString(this.DB.find(array.toString(), "CN"));
-            ip_info = ip_info.split(",")[2];
-        } catch (Exception e) {
-            e.printStackTrace();
+            ip_info = DB.find(cgi.toString(), "CN")[2];
         }
+        catch (Exception e) {
+        }
+//        StringBuffer sb = new StringBuffer().append(ip_info);
         return ip_info;
     }
 
+    @Override
     public String getDisplayString(String[] children) {
-        return "test";
+        return "Usage: SubstrCgi(String cgi)";
     }
 }
-
-
-
