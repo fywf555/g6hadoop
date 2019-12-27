@@ -22,7 +22,7 @@ import java.util.Arrays;
 @Description(name = "array_contains", value = "_FUNC_(array, value) - Returns TRUE if the array contains value.", extended = "Example:\n  > SELECT _FUNC_(array(1, 2, 3), 2) FROM src LIMIT 1;\n  true")
 public class IpCarrierName extends GenericUDF {
     private transient StringObjectInspector allCgi;
-    private static City DB;
+    public static City DB;
     @Override
     public ObjectInspector initialize(ObjectInspector[] arguments) throws UDFArgumentException {
         ObjectInspector a = arguments[0];
